@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 type columnSizes []int
@@ -64,14 +65,22 @@ func columnSizesFromHeaderLine(line string) columnSizes {
 func convertRowLineToCsvRow(cs columnSizes, line string) []string {
 	result := []string{}
 	start := 0
-	for i, v := range cs {
-		end := start + v
-		if i == len(cs)-1 {
-			end = len(line)
-		}
-		column := strings.TrimSpace(line[start:end])
+	for _, v := range cs {
+		temp := getSubstringRuneCount(start, v, line)
+		column := strings.TrimSpace(temp)
 		result = append(result, column)
-		start += v + 1
+		start += len(temp) + 1
 	}
 	return result
+}
+
+func getSubstringRuneCount(index, count int, line string) string {
+	line = line[index:]
+	result := []rune{}
+	for i := 0; i < count && len(line) > 0; i++ {
+		r, size := utf8.DecodeRuneInString(line)
+		result = append(result, r)
+		line = line[size:]
+	}
+	return string(result)
 }
