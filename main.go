@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"psql_to_csv/config"
 	"strings"
 	"unicode/utf8"
 )
@@ -12,13 +13,24 @@ import (
 type columnSizes []int
 
 func main() {
+	config.Load()
 	inScan := bufio.NewScanner(os.Stdin)
 	outCsv := csv.NewWriter(os.Stdout)
+	outCsv.Comma = config.Comma()
 	cs := columnSizes(nil)
 	if inScan.Scan() {
 		headerLine := inScan.Text()
 		cs = columnSizesFromHeaderLine(headerLine)
-		outCsv.Write(convertRowLineToCsvRow(cs, headerLine))
+		if config.HasHeaders() {
+			headers := config.Headers()
+			if len(headers) != len(cs) {
+				fmt.Fprintln(os.Stderr, "supplied headers and columns in table are not equal")
+				os.Exit(5)
+			}
+			outCsv.Write(headers)
+		} else {
+			outCsv.Write(convertRowLineToCsvRow(cs, headerLine))
+		}
 		if outCsv.Error() != nil {
 			fmt.Fprintln(os.Stderr, "could not write out header row")
 			os.Exit(4)
