@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"strings"
 )
 
@@ -22,7 +21,6 @@ func init() {
 
 func Load() {
 	loadArgs()
-	fmt.Println(*data)
 }
 
 func loadArgs() {
