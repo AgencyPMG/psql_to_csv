@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
-	"psql_to_csv/config"
+	"github.com/AgencyPMG/psql_to_csv/config"
 	"strings"
 	"unicode/utf8"
 )
